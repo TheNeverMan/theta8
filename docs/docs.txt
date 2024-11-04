@@ -1,0 +1,227 @@
+MLang Documentation
+
+MLang is "bad piet clone", thus all programs are in fact images
+
+FILE FORMAT
+-----------
+
+MLang program is 8x8 ppm bitmap.
+
+MEANING OF BYTES IN PROGRAM
+---------------------------
+
+MLang programs have following structure:
+
+x x x x x x x x
+x x x 0 x x x x
+x x x 0 x x x x
+x x x x x 0 0 x
+x 0 0 x x x x x
+x x x x 0 x x x
+x x x x 0 x x x
+x x x x x x x x
+
+x - program bytes
+0 - variable values
+
+PROGRAM
+-------
+
+As you could guess from before, each MLang program has 56 bytes (or less).
+Commands are colorcoded with basic colors:
+Red - #FF0000
+Green - #00FF00
+Blue - #0000FF
+Cyan - #00FFFF
+Magenta - #FF00FF
+Yellow - #FFFF00
+White - #FFFFFF
+Black - #000000
+This means that there are 8 commands, 8 accessible one byte unsigned variables.
+Execution of program starts from top-left corner if program reaches down-right corner without proper termination it should stop (i think interpreter loops it then).
+Due to problems with converting 24bit RGB to unsigned chars if you want to hardcode arbitrary byte values (like ASCII values) you should set Red Value of pixel in
+your image editor to proper value.
+When commands refer to their arguments, these arguments are next pixels of the program.
+Also there is 16 bytes big stack which can not be accessed directly, it is used for jumping.
+
+VARIABLES
+---------
+There are 8 variables, each described by one color from list above.
+They are all unsigned chars, however half of them are "text" variables and second half are "numeric".
+
+Text:
+Black
+Blue
+Green
+Cyan
+
+Numeric:
+Red
+Magenta
+Yellow
+White
+
+The difference is that when Print command is used with text variables coresponding ASCII character is displayed, while when
+printing numeric variables just value is displayed. Same applied when used with Ask command.
+
+Also when some commands are refering to "next variable", next variable is determined from list above ex.
+next variable to Black is Blue, to Red is Magenta and to White is Black
+
+COMMANDS
+--------
+There are 8 commands, each described by one color:
+Red - Print
+Green - Ask
+Blue - Set
+Cyan - If
+Magenta - Math
+Yellow - Jump
+White - End
+Black - RID
+
+Print
+-----
+
+Arguments:
+Variable
+
+Displays choosen variable on screen.
+
+
+Ask
+---
+
+Arguments:
+Variable
+
+Takes input from the user and stores it in choosen variable.
+
+Set
+---
+
+Arguments:
+Set Type
+Value 1
+Value 2
+
+Depending on the Set Type:
+
+Set Type  Value 1 is     Value 2 is
+Red       Variable       Variable
+Green     Value          Variable
+Blue      Variable       Address
+Cyan      Value          Address
+Magenta   Address        Variable
+Yellow    Address        Address
+Black       -               -
+White       -               -
+
+Variable - Color of one of variables
+Value - Arbitrary value coded in Red byte of the pixel
+Address - Address of one of the bytes in program (0-55) coded in Red byte of the pixel
+
+After determining Set Type, Value 1 is copied to Value 2 ex.
+Value of Red Variable copied to Blue Variable
+Value 0x45 to Black Variable
+Value of byte 0x05 to Blue Variable
+
+If
+--
+
+Arguments:
+Condition
+Variable
+Command
+
+Firstly condition is determined:
+Red - ==
+Green - >
+Blue - <
+Cyan - >=
+Magenta - <=
+Yellow - !=
+Black - unused
+White - unused
+
+Then variable next to choosen variable is taken (see VARIABLES chapter).
+Then the condition is checked on these variables.
+Example:
+Variable Choosen - a
+Variable next to it - b
+Condition - >=
+What if does:
+a >= b
+
+If condition is true Command is executed if not it is skipped.
+
+Math
+----
+
+Arguments:
+Operation
+Variable
+
+It is easiest to explain Math command using pseudocode:
+
+Choosen Variable -> a;
+Variable Next to it -> b;
+
+Operation      What Math Command does
+Red            b = b + a;
+Green          b = b - a;
+Blue           b = b * a;
+Cyan           b = b / a;
+Magenta        b = b % a;
+Yellow         b = ~(b & a);
+Black          b = b & a;
+White          b = b | a;
+
+(i'm using c++ syntax)
+
+Jump
+----
+
+Arguments:
+Address
+
+If address is 0x0 returns to the current address on stack and then pops it. If stack is empty does nothing.
+If address is not zero jumps to it and puts current address on stack. If stack is full overwrites last cell.
+
+RID
+---
+
+Arguments:
+RID operation
+Variable
+
+RID stands for Rotate Increment Decrement and I made it due to lack of easy way to increment or decrement something.
+
+Choosen Variable -> a
+
+RID Operation      What RID does
+Red                a++
+Green              a--
+Blue               a = a << 1
+Cyan               a = a >> 1
+Magenta            a = ~a
+Yellow             a = rand()
+Black              unused
+White              unused
+
+END
+---
+
+Arguments:
+End operation
+
+Depending on end operation End:
+
+End Operation      What End does
+Red                Ends program
+Green              Resets variables to initial values, cleans stack and restarts program execution
+Blue               Ends Program, saves variables current value back to program file (unimplemented)
+Cyan               cleans stack and restarts program execution (however keeps current variables state)
+Magenta            same as Blue but Value of Black variable is randomized
+Yellow             same as Cyan but value of Black variable is randomized
+Black              unused
+White              unused
