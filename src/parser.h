@@ -17,9 +17,9 @@ struct RGB
 
 struct Program_Data
 {
-  byte Variables[8];
-  byte Program[56];
+  byte* Variables;
+  byte* Program;
 };
 
-/*returns char[64] that is ready to be pasted into interpreter*/
-byte* Parse_File(char* filename);
+/* returns Program_Data struct that has split to variables and program*/
+struct Program_Data Parse_File(char* filename);

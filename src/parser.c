@@ -51,11 +51,14 @@ static struct RGB* Parse_PPM(char* filename)
   return out;
 }
 
-byte* Parse_File(char* filename)
+struct Program_Data Parse_File(char* filename)
 {
-  byte* out = NULL;
+  struct Program_Data out;
+  out.Program = malloc(sizeof(byte)*(MATRIX_SIZE-8));
+  out.Variables = malloc(sizeof(byte)*8);
+  byte* color_array = NULL;
   struct RGB* Pixel_Array = Parse_PPM(filename);
-  out = malloc(sizeof(byte) * MATRIX_SIZE);
+  color_array = malloc(sizeof(byte) * MATRIX_SIZE);
   int index = 0;
   while(index < MATRIX_SIZE)
   {
@@ -72,9 +75,22 @@ byte* Parse_File(char* filename)
     }
     else
       tmp = Pixel_Array[index].R;
-    out[index] = tmp;
+    color_array[index] = tmp;
     index++;
   }
   free(Pixel_Array);
+  index = 0;
+  int program_data_index = 0;
+  int variables_index = 0;
+  while(index < MATRIX_SIZE)
+  {
+  /* read variables */
+   if(index == 11 || index == 19 || index == 29 || index == 30 || index == 33 || index == 34 || index == 44 || index == 52)
+		out.Variables[variables_index++] = color_array[index];
+	else
+		out.Program[program_data_index++] = color_array[index];
+  	 index++;
+  }
+  free(color_array);
   return out;
 }
