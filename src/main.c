@@ -3,6 +3,7 @@
 #include "help_messages.h"
 #include "interpreter.h"
 #include "parser.h"
+#include "runtime.h"
 
 void Destroy_Objects()
 {
@@ -27,21 +28,7 @@ int main(int argv, char** argc)
   if(!Interpreter_Flags.quiet)
     puts(Interpreter_Flags.filepath);
   struct Program_Data Loaded_Program_Data = Parse_File(Interpreter_Flags.filepath);
-  /* debug */
-  /* move to runtime? */
-  if(Interpreter_Flags.is_in_debug_mode)
-  {
-  	int var_index = 0;
-  	char names[8] = {'L','B','G','C','R','M','Y','W'};
-  	puts("Loaded variables:");
-  	while(var_index < 8)
-  	{
-  		printf("%c: %i (%X) '%c'\n", names[var_index],Loaded_Program_Data.Variables[var_index],Loaded_Program_Data.Variables[var_index],Loaded_Program_Data.Variables[var_index]);
-  		var_index++;
-  	}
-  }
-  free(Loaded_Program_Data.Variables);
-  free(Loaded_Program_Data.Program);
+  Interpret(Interpreter_Flags, Loaded_Program_Data);
   return 0;
 
 }
