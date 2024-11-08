@@ -64,17 +64,60 @@ static void Validate_Variable(const struct Runtime* const Env,const byte value)
 
 static byte Get_Var(const struct Runtime* const Env, const byte var)
 {
+  Validate_Variable(Env,var);
   return Env->Program.Variables[var % 8];
+}
+
+static void Set_Var(struct Runtime* const Env, const byte var, const byte value)
+{
+  Validate_Variable(Env,var);
+  Env->Program.Variables[var % 8] = value;
+}
+
+static char Get_Variable_Name(const byte variable)
+{
+  char names[8] = {'L','B','G','C','R','M','Y','W'};
+  return names[variable % 8];
 }
 
 static void Command_Print(struct Runtime* const Env)
 {
   byte variable_to_print = Get_Next_Pixel(Env);
-  Validate_Variable(Env,variable_to_print);
+  if(Env->Flags.is_in_debug_mode)
+    printf("Print %c\n",Get_Variable_Name(variable_to_print));
   if(variable_to_print < 4)
     putchar(Get_Var(Env, variable_to_print));
   else
     printf("%d",Get_Var(Env, variable_to_print));
+}
+
+static void Command_Ask(struct Runtime* const Env)
+{
+  byte variable_to_ask = Get_Next_Pixel(Env);
+  char format_mask[4] = "%i";
+  byte buffer = ' ';
+  bool loop = FALSE;
+  if(Env->Flags.is_in_debug_mode)
+    printf("Ask %c\n",Get_Variable_Name(variable_to_ask));
+  if(variable_to_ask < 4)
+    strcpy(format_mask, "%1c");
+  do
+  {
+    if(Env->Flags.show_prompt_on_ask_command)
+      printf("?");
+    loop = scanf(format_mask,&buffer);
+    if(!loop)
+    {
+      byte c;
+      do {
+        c = getchar();
+      }
+      while (!isdigit(c));
+      ungetc(c, stdin);
+    }
+  }
+  while(!loop);
+  Set_Var(Env,variable_to_ask,buffer);
 }
 
 static bool Interpret_Command(struct Runtime* const Env)
@@ -95,6 +138,7 @@ static bool Interpret_Command(struct Runtime* const Env)
     }
     case GREEN:
     {
+      Command_Ask(Env);
       break;
     }
     case CYAN:
@@ -129,11 +173,13 @@ static bool Interpret_Command(struct Runtime* const Env)
 
 void Interpret(struct Interpreter_Data Flags, struct Program_Data Program)
 {
-  struct Runtime Env = {.Flags = Flags, .Program = Program, .program_counter = 0, .is_out_of_file = 0};
+  struct Runtime Env = {.Flags = Flags, .Program = Program, .program_counter = -1, .is_out_of_file = 0};
   bool loop = TRUE;
   while(loop && !(Env.is_out_of_file))
   {
     loop = Interpret_Command(&Env);
+    if(Env.Flags.is_in_step_by_step_mode)
+      getchar();
   }
   free(Program.Variables);
   free(Program.Program);

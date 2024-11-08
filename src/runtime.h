@@ -1,4 +1,5 @@
 #pragma once
+#include <ctype.h>
 #include "interpreter.h"
 #include "parser.h"
 #include "errorcodes.h"

@@ -91,6 +91,10 @@ struct Program_Data Parse_File(char* filename)
 		out.Program[program_data_index++] = color_array[index];
   	 index++;
   }
+  index = 0;
+  while(index < 56)
+    printf("%i ",out.Program[index++]);
+  printf("\n");
   free(color_array);
   return out;
 }
