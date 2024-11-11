@@ -46,12 +46,12 @@ static byte Get_Next_Pixel(struct Runtime* const Env)
   if(Env->program_counter == 56)
   {
     Trigger_Warning(Env, runtime_eof);
-    return RED;
+    return WHITE;
   }
   if(Env->program_counter > 56)
   {
     Trigger_Warning(Env, runtime_after_eof);
-    return RED;
+    return WHITE;
   }
   return Env->Program.Program[Env->program_counter];
 }
@@ -61,6 +61,19 @@ static void Validate_Variable(const struct Runtime* const Env,const byte value)
   if(value < 0 || value > 7)
     Trigger_Error(Env, invalid_variable);
 }
+
+static void Validate_Adress(const struct Runtime* const Env,const byte value)
+{
+  if(value < 0 || value > 55)
+    Trigger_Error(Env, invalid_address);
+}
+
+static void Validate_Argument(const struct Runtime* const Env,const byte value)
+{
+  if(value < 0 || value > 7)
+    Trigger_Error(Env, invalid_command_argument);
+}
+
 
 static byte Get_Var(const struct Runtime* const Env, const byte var)
 {
@@ -73,6 +86,19 @@ static void Set_Var(struct Runtime* const Env, const byte var, const byte value)
   Validate_Variable(Env,var);
   Env->Program.Variables[var % 8] = value;
 }
+
+static byte Get_Addr(const struct Runtime* const Env, const byte addr)
+{
+  Validate_Adress(Env,addr);
+  return Env->Program.Program[addr % 56];
+}
+
+static void Set_Addr(struct Runtime* const Env, const byte addr, const byte value)
+{
+  Validate_Adress(Env,addr);
+  Env->Program.Program[addr % 56] = value;
+}
+
 
 static char Get_Variable_Name(const byte variable)
 {
@@ -120,6 +146,51 @@ static void Command_Ask(struct Runtime* const Env)
   Set_Var(Env,variable_to_ask,buffer);
 }
 
+static void Command_Set(struct Runtime* const Env)
+{
+  byte argument = Get_Next_Pixel(Env);
+  byte val_1 = Get_Next_Pixel(Env);
+  byte val_2 = Get_Next_Pixel(Env);
+  Validate_Argument(Env, argument);
+  switch(argument)
+  {
+    case RED:
+    {
+      Set_Var(Env,val_2,Get_Var(Env,val_1));
+      break;
+    }
+    case GREEN:
+    {
+      Set_Var(Env,val_2,val_1);
+      break;
+    }
+    case BLUE:
+    {
+      Set_Addr(Env,val_2,Get_Var(Env,val_1));
+      break;
+    }
+    case CYAN:
+    {
+      Set_Addr(Env,val_2,val_1);
+      break;
+    }
+    case MAGENTA:
+    {
+      Set_Var(Env,val_2,Get_Addr(Env,val_1));
+      break;
+    }
+    case YELLOW:
+    {
+      Set_Addr(Env,val_2,Get_Addr(Env,val_1));
+      break;
+    }
+    default:
+    {
+      Trigger_Error(Env, unused_argument_error);
+    }
+  }
+}
+
 static bool Interpret_Command(struct Runtime* const Env)
 {
   if(Env->Flags.is_in_debug_mode)
@@ -134,6 +205,7 @@ static bool Interpret_Command(struct Runtime* const Env)
     }
     case BLUE:
     {
+      Command_Set(Env);
       break;
     }
     case GREEN:

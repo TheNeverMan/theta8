@@ -12,6 +12,9 @@ const int runtime_eof = 4;
 const int runtime_after_eof = 5;
 const int invalid_command = 6;
 const int invalid_variable = 7;
+const int invalid_command_argument = 8;
+const int invalid_address = 9;
+const int unused_argument_error = 10;
 
 const char* Error_Table[][3] =
 {
@@ -22,7 +25,10 @@ const char* Error_Table[][3] =
 {Runtime_Warning, "EF", "Program Counter Reached EOF"},
 {Runtime_Warning, "AE", "Program Counter Is After EOF - Returning Default Value"},
 {Runtime_Error,"IC","Invalid Command"},
-{Runtime_Error,"IV","Invalid Variable"}
+{Runtime_Error,"IV","Invalid Variable"},
+{Runtime_Error,"IR","Invalid Command Argument"},
+{Runtime_Error,"ID","Invalid Adress"},
+{Runtime_Error,"UR","Unused Command Argument"}
 };
 
 

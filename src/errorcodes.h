@@ -11,6 +11,9 @@ extern const int runtime_eof;
 extern const int runtime_after_eof;
 extern const int invalid_command;
 extern const int invalid_variable;
+extern const int invalid_command_argument;
+extern const int invalid_address;
+extern const int unused_argument_error;
 extern const char* Error_Table[][3];
 
 void Print_Error(int error_code, bool show_full_message);
