@@ -9,6 +9,18 @@
 #define YELLOW 6
 #define WHITE 7
 
+static const byte Command_Length[8] = {3,4,2,3,2,3,2,2};
+/*{
+  {BLACK,3},
+  {BLUE,4},
+  {GREEN,2},
+  {CYAN,3},
+  {RED,2},
+  {MAGENTA,2},
+  {YELLOW,2},
+  {WHITE,2}
+};*/
+
 static void Pretty_Display_Variable_Values(const struct Runtime* const Env)
 {
   int var_index = 0;
@@ -19,6 +31,7 @@ static void Pretty_Display_Variable_Values(const struct Runtime* const Env)
     printf("%c: %i (0x%X) '%c'\n", names[var_index],Env->Program.Variables[var_index],Env->Program.Variables[var_index],Env->Program.Variables[var_index]);
     var_index++;
   }
+  printf("PC: %i (0x%X)\n",Env->program_counter+1, Env->Program.Program[(Env->program_counter+1)%56]);
 }
 
 static void Trigger_Warning(const struct Runtime* const Env, const int warning_code)
@@ -56,6 +69,16 @@ static byte Get_Next_Pixel(struct Runtime* const Env)
   return Env->Program.Program[Env->program_counter];
 }
 
+static void Increment_Program_Counter_By_Value(struct Runtime* const Env, const byte value)
+{
+  int index = 0;
+  while(index < value)
+  {
+    Get_Next_Pixel(Env);
+    index++;
+  }
+}
+
 static void Validate_Variable(const struct Runtime* const Env,const byte value)
 {
   if(value < 0 || value > 7)
@@ -74,6 +97,11 @@ static void Validate_Argument(const struct Runtime* const Env,const byte value)
     Trigger_Error(Env, invalid_command_argument);
 }
 
+static byte Get_Next_Var(const struct Runtime* const Env, const byte var)
+{
+  Validate_Variable(Env,var);
+  return Env->Program.Variables[(var+1) % 8];
+}
 
 static byte Get_Var(const struct Runtime* const Env, const byte var)
 {
@@ -103,6 +131,12 @@ static void Set_Addr(struct Runtime* const Env, const byte addr, const byte valu
 static char Get_Variable_Name(const byte variable)
 {
   char names[8] = {'L','B','G','C','R','M','Y','W'};
+  return names[variable % 8];
+}
+
+static char Get_If_Condition_Name(const byte variable)
+{
+  char names[8] = {'=','>','<',']','[','!','?','?'};
   return names[variable % 8];
 }
 
@@ -152,6 +186,8 @@ static void Command_Set(struct Runtime* const Env)
   byte val_1 = Get_Next_Pixel(Env);
   byte val_2 = Get_Next_Pixel(Env);
   Validate_Argument(Env, argument);
+  if(Env->Flags.is_in_debug_mode)
+    printf("Set %c -%c> %c\n",Get_Variable_Name(val_1),Get_Variable_Name(argument),Get_Variable_Name(val_2));
   switch(argument)
   {
     case RED:
@@ -187,7 +223,70 @@ static void Command_Set(struct Runtime* const Env)
     default:
     {
       Trigger_Error(Env, unused_argument_error);
+      break;
     }
+  }
+}
+
+static void Command_If(struct Runtime* const Env)
+{
+  byte condition = Get_Next_Pixel(Env);
+  byte var_1 = Get_Next_Pixel(Env);
+  byte val_1 = Get_Var(Env,var_1);
+  byte val_2 = Get_Next_Var(Env,var_1);
+  bool skip_next_command = TRUE;
+  Validate_Argument(Env, condition);
+  if(Env->Flags.is_in_debug_mode)
+    printf("If %c %c %c\n",Get_Variable_Name(var_1),Get_If_Condition_Name(condition),Get_Variable_Name(var_1+1));
+  switch(condition)
+  {
+    case RED:
+    {
+      if(val_1 == val_2)
+        skip_next_command = FALSE;
+      break;
+    }
+    case GREEN:
+    {
+      if(val_1 < val_2)
+        skip_next_command = FALSE;
+      break;
+    }
+    case BLUE:
+    {
+      if(val_1 > val_2)
+        skip_next_command = FALSE;
+      break;
+    }
+    case CYAN:
+    {
+      if(val_1 <= val_2)
+        skip_next_command = FALSE;
+      break;
+    }
+    case MAGENTA:
+    {
+      if(val_1 >= val_2)
+        skip_next_command = FALSE;
+      break;
+    }
+    case YELLOW:
+    {
+      if(val_1 != val_2)
+        skip_next_command = FALSE;
+      break;
+    }
+    default:
+    {
+      Trigger_Error(Env, unused_argument_error);
+    }
+  }
+  if(skip_next_command)
+  {
+    byte next_com = Get_Next_Pixel(Env);
+    Validate_Variable(Env,next_com);
+    /* already decremented by Get_Next_Pixel*/
+    Increment_Program_Counter_By_Value(Env,Command_Length[next_com]-1);
   }
 }
 
@@ -215,6 +314,7 @@ static bool Interpret_Command(struct Runtime* const Env)
     }
     case CYAN:
     {
+      Command_If(Env);
       break;
     }
     case RED:
