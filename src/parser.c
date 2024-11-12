@@ -14,10 +14,11 @@ static struct RGB* Parse_PPM(char* filename)
 {
   struct RGB* out = NULL;
   FILE* File = Open_File(filename);
-  out = malloc(sizeof(struct RGB) * MATRIX_SIZE); /* we need 64 pixels*/
   /*read ppm header there is only one correct header so we can just compare it to reference i guess*/
   char* reference_header = "P6\n8 8\n255\n";
   char* header_from_file = malloc(sizeof(char)*(strlen(reference_header)+1));
+  int index = 0;
+  out = malloc(sizeof(struct RGB) * MATRIX_SIZE); /* we need 64 pixels*/
   fread(header_from_file,sizeof(char),strlen(reference_header),File);
   if(feof(File) || ferror(File))
   {
@@ -32,7 +33,6 @@ static struct RGB* Parse_PPM(char* filename)
     Print_Error(invalid_ppm_header, TRUE);
   }
   free(header_from_file);
-  int index = 0;
   while(index < MATRIX_SIZE)
   {
     byte tmp[3];
@@ -54,12 +54,14 @@ static struct RGB* Parse_PPM(char* filename)
 struct Program_Data Parse_File(char* filename)
 {
   struct Program_Data out;
-  out.Program = malloc(sizeof(byte)*(MATRIX_SIZE-8));
-  out.Variables = malloc(sizeof(byte)*8);
   byte* color_array = NULL;
   struct RGB* Pixel_Array = Parse_PPM(filename);
-  color_array = malloc(sizeof(byte) * MATRIX_SIZE);
   int index = 0;
+  int program_data_index = 0;
+  int variables_index = 0;
+  out.Program = malloc(sizeof(byte)*(MATRIX_SIZE-8));
+  out.Variables = malloc(sizeof(byte)*8);
+  color_array = malloc(sizeof(byte) * MATRIX_SIZE);
   while(index < MATRIX_SIZE)
   {
     byte tmp = 0;
@@ -80,8 +82,7 @@ struct Program_Data Parse_File(char* filename)
   }
   free(Pixel_Array);
   index = 0;
-  int program_data_index = 0;
-  int variables_index = 0;
+
   while(index < MATRIX_SIZE)
   {
   /* read variables */
