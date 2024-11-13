@@ -31,7 +31,7 @@ static void Pretty_Display_Variable_Values(const struct Runtime* const Env)
     printf("%c: %i (0x%X) '%c'\n", names[var_index],Env->Program.Variables[var_index],Env->Program.Variables[var_index],Env->Program.Variables[var_index]);
     var_index++;
   }
-  printf("PC: %i (0x%X)\n",Env->program_counter+1, Env->Program.Program[(Env->program_counter+1)%56]);
+  printf("PC: %i (0x%X)\n",Env->program_counter, Env->Program.Program[(Env->program_counter+1)%56]);
 }
 
 static void Trigger_Warning(const struct Runtime* const Env, const int warning_code)
@@ -136,7 +136,13 @@ static char Get_Variable_Name(const byte variable)
 
 static char Get_If_Condition_Name(const byte variable)
 {
-  char names[8] = {'=','>','<',']','[','!','?','?'};
+  char names[8] = {'?','<','>',']','=','[','!','?'};
+  return names[variable % 8];
+}
+
+static char Get_Math_Operation_Name(const byte variable)
+{
+  char names[8] = {'&','*','-','/','+','%','N','|'};
   return names[variable % 8];
 }
 
@@ -290,16 +296,90 @@ static void Command_If(struct Runtime* const Env)
   }
 }
 
+static void Command_Math(struct Runtime* const Env)
+{
+  byte operation = Get_Next_Pixel(Env);
+  byte var_1 = Get_Next_Pixel(Env);
+  byte val_1 = Get_Var(Env,var_1);
+  byte val_2 = Get_Next_Var(Env,var_1);
+  Validate_Argument(Env, operation);
+  if(Env->Flags.is_in_debug_mode)
+    printf("Math %c = %c %c %c\n",Get_Variable_Name(var_1+1),Get_Variable_Name(var_1+1),Get_Math_Operation_Name(operation),Get_Variable_Name(var_1));
+  switch(operation)
+  {
+    case RED:
+    {
+      Set_Var(Env,var_1+1,(val_2 + val_1));
+      break;
+    }
+    case GREEN:
+    {
+      Set_Var(Env,var_1+1,(val_2 - val_1));
+      break;
+    }
+    case BLUE:
+    {
+      Set_Var(Env,var_1+1,(val_2 * val_1));
+      break;
+    }
+    case CYAN:
+    {
+      Set_Var(Env,var_1+1,(val_2 / val_1));
+      break;
+    }
+    case MAGENTA:
+    {
+      Set_Var(Env,var_1+1,(val_2 % val_1));
+      break;
+    }
+    case YELLOW:
+    {
+      Set_Var(Env,var_1+1,~(val_2 & val_1));
+      break;
+    }
+    case BLACK:
+    {
+      Set_Var(Env,var_1+1,(val_2 & val_1));
+      break;
+    }
+    case WHITE:
+    {
+      Set_Var(Env,var_1+1,~(val_2 | val_1));
+      break;
+    }
+    default:
+    {
+      Trigger_Error(Env, unused_argument_error);
+    }
+  }
+}
+
+static void Command_Jump(struct Runtime* const Env)
+{
+
+}
+
+static void Command_End(struct Runtime* const Env)
+{
+
+}
+
+static void Command_RID(struct Runtime* const Env)
+{
+  
+}
+
 static bool Interpret_Command(struct Runtime* const Env)
 {
-  if(Env->Flags.is_in_debug_mode)
-    Pretty_Display_Variable_Values(Env);
   const byte command = Get_Next_Pixel(Env);
   bool loop = TRUE;
+  if(Env->Flags.is_in_debug_mode)
+    Pretty_Display_Variable_Values(Env);
   switch(command)
   {
     case BLACK:
     {
+      Command_RID(Env);
       break;
     }
     case BLUE:
@@ -324,14 +404,17 @@ static bool Interpret_Command(struct Runtime* const Env)
     }
     case MAGENTA:
     {
+      Command_Math(Env);
       break;
     }
     case YELLOW:
     {
+      Command_Jump(Env);
       break;
     }
     case WHITE:
     {
+      Command_End(Env);
       break;
     }
     default:

@@ -14,8 +14,9 @@ static void Initialize_Interpreter_Data_Struct(struct Interpreter_Data* Data)
 struct Interpreter_Data Generate_Interpreter_Data(const int argv, char **argc)
 {
   struct Interpreter_Data out;
-  Initialize_Interpreter_Data_Struct(&out);
   int index = 1; /*first argc is program name*/
+  char option = argc[index][1];
+  Initialize_Interpreter_Data_Struct(&out);
   do
   {
     if((strlen(argc[index]) != 2) && (index < (argv-1)))
@@ -23,7 +24,6 @@ struct Interpreter_Data Generate_Interpreter_Data(const int argv, char **argc)
       Print_Error(invalid_argument_error, TRUE);
     }
 
-    char option = argc[index][1];
     switch(option)
     {
       case 'v':
