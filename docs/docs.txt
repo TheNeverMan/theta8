@@ -219,9 +219,9 @@ Depending on end operation End:
 End Operation      What End does
 Red                Ends program
 Green              Resets variables to initial values, cleans stack and restarts program execution
-Blue               Ends Program, saves variables current value back to program file (unimplemented)
+Blue               TO_BE_DELETED: Ends Program, saves variables current value back to program file (unimplemented)
 Cyan               cleans stack and restarts program execution (however keeps current variables state)
-Magenta            same as Blue but Value of Black variable is randomized
+Magenta            TO_BE_DELETED: same as Blue but Value of Black variable is randomized
 Yellow             same as Cyan but value of Black variable is randomized
-Black              unused
-White              unused
+Black              NEW: performs jump to 0 and puts current program counter on stack (like jump command)
+White              NEW: Ends program
