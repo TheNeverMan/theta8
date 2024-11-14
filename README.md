@@ -1,4 +1,5 @@
 # MLang
+![build status](https://github.com/TheNeverMan/mlang/actions/workflows/c-cpp.yml/badge.svg)
 MLang is a really minimalistic esoteric programming language. Programs are heavily space limited as interpreter accepts them in form of 8x8 bitmaps.
 Rest of readme will appear later.
 # Docs
