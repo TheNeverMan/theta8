@@ -146,6 +146,12 @@ static char Get_Math_Operation_Name(const byte variable)
   return names[variable % 8];
 }
 
+static char Get_End_Mode_Name(const byte variable)
+{
+  char names[8] = {'J','?','R','r','E','?','l','E'};
+  return names[variable % 8];
+}
+
 static void Command_Print(struct Runtime* const Env)
 {
   byte variable_to_print = Get_Next_Pixel(Env);
@@ -166,23 +172,26 @@ static void Command_Ask(struct Runtime* const Env)
   if(Env->Flags.is_in_debug_mode)
     printf("Ask %c\n",Get_Variable_Name(variable_to_ask));
   if(variable_to_ask < 4)
-    strcpy(format_mask, "%1c");
-  do
   {
-    if(Env->Flags.show_prompt_on_ask_command)
-      printf("?");
-    loop = scanf(format_mask,&buffer);
-    if(!loop)
-    {
-      byte c;
-      do {
-        c = getchar();
-      }
-      while (!isdigit(c));
-      ungetc(c, stdin);
-    }
+    buffer = getchar();
   }
-  while(!loop);
+  else
+    do
+    {
+      if(Env->Flags.show_prompt_on_ask_command)
+        printf("?");
+      loop = scanf(format_mask,&buffer);
+      if(!loop)
+      {
+        byte c;
+        do {
+          c = getchar();
+        }
+        while (!isdigit(c));
+        ungetc(c, stdin);
+      }
+    }
+    while(!loop);
   Set_Var(Env,variable_to_ask,buffer);
 }
 
@@ -324,11 +333,15 @@ static void Command_Math(struct Runtime* const Env)
     }
     case CYAN:
     {
+      if(!val_1)
+        Trigger_Error(Env,division_by_zero);
       Set_Var(Env,var_1+1,(val_2 / val_1));
       break;
     }
     case MAGENTA:
     {
+      if(!val_1)
+        Trigger_Error(Env,division_by_zero);
       Set_Var(Env,var_1+1,(val_2 % val_1));
       break;
     }
@@ -356,17 +369,94 @@ static void Command_Math(struct Runtime* const Env)
 
 static void Command_Jump(struct Runtime* const Env)
 {
-
+  byte address = Get_Next_Pixel(Env);
+  Validate_Adress(Env,address);
+  if(Env->Flags.is_in_debug_mode)
+    printf("Jump %i\n",address);
+  if(!address)
+  {
+    if(!(Env->stack_pointer))
+    {
+      Trigger_Warning(Env,stack_empty);
+      return;
+    }
+    Env->program_counter = Env->Stack[Env->stack_pointer];
+    Env->stack_pointer--;
+    return;
+  }
+  if(Env->stack_pointer == 15)
+    Trigger_Warning(Env,stack_full);
+  else
+    Env->stack_pointer++;
+  Env->Stack[Env->stack_pointer] = Env->program_counter;
+  Env->program_counter = address - 1;
 }
 
-static void Command_End(struct Runtime* const Env)
+static bool Command_End(struct Runtime* const Env)
 {
-
+  bool out = TRUE;
+  byte operation = Get_Next_Pixel(Env);
+  Validate_Argument(Env, operation);
+  if(Env->Flags.is_in_debug_mode)
+    printf("End %c\n",Get_End_Mode_Name(operation));
+  switch(operation)
+  {
+    case RED:
+    {
+      out = FALSE;
+      break;
+    }
+    case GREEN:
+    {
+      memcpy(Env->Program.Variables, Env->Default_Variables, sizeof(byte)* 8);
+      Env->stack_pointer = 0;
+      Env->program_counter = -1;
+      break;
+    }
+    case BLUE:
+    {
+      Trigger_Error(Env, unused_argument_error);
+      break;
+    }
+    case CYAN:
+    {
+      Env->stack_pointer = 0;
+      Env->program_counter = -1;
+      break;
+    }
+    case MAGENTA:
+    {
+      Trigger_Error(Env, unused_argument_error);
+      break;
+    }
+    case YELLOW:
+    {
+      Set_Var(Env,BLACK,rand() % 256);
+      Env->stack_pointer = 0;
+      Env->program_counter = -1;
+      break;
+    }
+    case BLACK:
+    {
+      Env->program_counter = -1;
+      break;
+    }
+    case WHITE:
+    {
+      out = FALSE;
+      break;
+    }
+    default:
+    {
+      Trigger_Error(Env, unused_argument_error);
+    }
+  }
+  return out;
 }
 
 static void Command_RID(struct Runtime* const Env)
 {
-  
+
 }
 
 static bool Interpret_Command(struct Runtime* const Env)
@@ -414,7 +504,7 @@ static bool Interpret_Command(struct Runtime* const Env)
     }
     case WHITE:
     {
-      Command_End(Env);
+      loop = Command_End(Env);
       break;
     }
     default:
@@ -428,13 +518,25 @@ static bool Interpret_Command(struct Runtime* const Env)
 
 void Interpret(struct Interpreter_Data Flags, struct Program_Data Program)
 {
-  struct Runtime Env = {.Flags = Flags, .Program = Program, .program_counter = -1, .is_out_of_file = 0};
+  struct Runtime Env = {.Flags = Flags, .Program = Program, .program_counter = -1, .is_out_of_file = 0, .stack_pointer = 0, .Stack = {0}};
   bool loop = TRUE;
+  srand(time(NULL));
+  memcpy(Env.Default_Variables, Env.Program.Variables, sizeof(byte)* 8);
+  if(!Env.Flags.quiet)
+  {
+    int index = 0;
+    while(index < 56)
+      printf("%i ",Env.Program.Program[index++]);
+    printf("\n");
+  }
+
   while(loop && !(Env.is_out_of_file))
   {
     loop = Interpret_Command(&Env);
     if(Env.Flags.is_in_step_by_step_mode)
       getchar();
+    fflush(stdout);
+    fflush(stdin);
   }
   free(Program.Variables);
   free(Program.Program);

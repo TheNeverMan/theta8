@@ -14,6 +14,9 @@ extern const int invalid_variable;
 extern const int invalid_command_argument;
 extern const int invalid_address;
 extern const int unused_argument_error;
+extern const int stack_empty;
+extern const int stack_full;
+extern const int division_by_zero;
 extern const char* Error_Table[][3];
 
 void Print_Error(int error_code, bool show_full_message);

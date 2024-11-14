@@ -15,6 +15,9 @@ const int invalid_variable = 7;
 const int invalid_command_argument = 8;
 const int invalid_address = 9;
 const int unused_argument_error = 10;
+const int stack_empty = 11;
+const int stack_full = 12;
+const int division_by_zero = 13;
 
 const char* Error_Table[][3] =
 {
@@ -28,7 +31,10 @@ const char* Error_Table[][3] =
 {Runtime_Error,"IV","Invalid Variable"},
 {Runtime_Error,"IR","Invalid Command Argument"},
 {Runtime_Error,"ID","Invalid Adress"},
-{Runtime_Error,"UR","Unused Command Argument"}
+{Runtime_Error,"UR","Unused Command Argument"},
+{Runtime_Warning,"SE","Stack Empty On Return"},
+{Runtime_Warning,"SO","Stack Overflow On Jump"},
+{Runtime_Error,"DZ","Division By Zero"}
 };
 
 
