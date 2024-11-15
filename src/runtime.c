@@ -28,7 +28,7 @@ static void Pretty_Display_Variable_Values(const struct Runtime* const Env)
   puts("Loaded variables:");
   while(var_index < 8)
   {
-    printf("%c: %i (0x%X) '%c'\n", names[var_index],Env->Program.Variables[var_index],Env->Program.Variables[var_index],Env->Program.Variables[var_index]);
+    printf("%c: %i (0x%X) \n", names[var_index],Env->Program.Variables[var_index],Env->Program.Variables[var_index]);
     var_index++;
   }
   printf("PC: %i (0x%X)\n",Env->program_counter, Env->Program.Program[(Env->program_counter+1)%56]);
@@ -329,46 +329,46 @@ static void Command_Math(struct Runtime* const Env)
   {
     case RED:
     {
-      Set_Var(Env,var_1+1,(val_2 + val_1));
+      Set_Var(Env,(var_1+1) % 8,(val_2 + val_1));
       break;
     }
     case GREEN:
     {
-      Set_Var(Env,var_1+1,(val_2 - val_1));
+      Set_Var(Env,(var_1+1) % 8,(val_2 - val_1));
       break;
     }
     case BLUE:
     {
-      Set_Var(Env,var_1+1,(val_2 * val_1));
+      Set_Var(Env,(var_1+1) % 8,(val_2 * val_1));
       break;
     }
     case CYAN:
     {
       if(!val_1)
         Trigger_Error(Env,division_by_zero);
-      Set_Var(Env,var_1+1,(val_2 / val_1));
+      Set_Var(Env,(var_1+1) % 8,(val_2 / val_1));
       break;
     }
     case MAGENTA:
     {
       if(!val_1)
         Trigger_Error(Env,division_by_zero);
-      Set_Var(Env,var_1+1,(val_2 % val_1));
+      Set_Var(Env,(var_1+1) % 8,(val_2 % val_1));
       break;
     }
     case YELLOW:
     {
-      Set_Var(Env,var_1+1,~(val_2 & val_1));
+      Set_Var(Env,(var_1+1) % 8,~(val_2 & val_1));
       break;
     }
     case BLACK:
     {
-      Set_Var(Env,var_1+1,(val_2 & val_1));
+      Set_Var(Env,(var_1+1) % 8,(val_2 & val_1));
       break;
     }
     case WHITE:
     {
-      Set_Var(Env,var_1+1,~(val_2 | val_1));
+      Set_Var(Env,(var_1+1) % 8,~(val_2 | val_1));
       break;
     }
     default:
@@ -595,11 +595,12 @@ void Interpret(struct Interpreter_Data Flags, struct Program_Data Program)
 
   while(loop && !(Env.is_out_of_file))
   {
-    loop = Interpret_Command(&Env);
     char c;
+    loop = Interpret_Command(&Env);
     if(Env.Flags.is_in_step_by_step_mode)
-      getchar();
-    while ((c = getchar()) != '\n' && c != EOF) { }
+      while ((c = getchar()) != '\n' && c != EOF) { }
+      /*getchar();*/
+    fflush(stdout);
   }
   free(Program.Variables);
   free(Program.Program);
