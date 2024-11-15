@@ -576,7 +576,7 @@ static bool Interpret_Command(struct Runtime* const Env)
 
 void Interpret(struct Interpreter_Data Flags, struct Program_Data Program)
 {
-  struct Runtime Env = {.Flags = Flags, .Program = Program, .program_counter = -1, .is_out_of_file = 0, .stack_pointer = 0, .Stack = {0}};
+  struct Runtime Env = {Flags,Program,{0},-1,0,0,{0}};
   bool loop = TRUE;
   srand(time(NULL));
   memcpy(Env.Default_Variables, Env.Program.Variables, sizeof(byte)* 8);
