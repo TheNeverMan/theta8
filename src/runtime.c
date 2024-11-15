@@ -476,12 +476,12 @@ static void Command_RID(struct Runtime* const Env)
   {
     case RED:
     {
-      Set_Var(Env,var_1,val_1++);
+      Set_Var(Env,var_1,++val_1);
       break;
     }
     case GREEN:
     {
-      Set_Var(Env,var_1,val_1--);
+      Set_Var(Env,var_1,--val_1);
       break;
     }
     case BLUE:
