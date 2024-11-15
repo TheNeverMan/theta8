@@ -172,7 +172,6 @@ static void Command_Print(struct Runtime* const Env)
 static void Command_Ask(struct Runtime* const Env)
 {
   const byte variable_to_ask = Get_Next_Pixel(Env);
-  byte buffer = ' ';
   unsigned int tmp = 0;
   bool loop = FALSE;
   if(Env->Flags.is_in_debug_mode)
@@ -181,15 +180,19 @@ static void Command_Ask(struct Runtime* const Env)
 
   if(Env->Flags.show_prompt_on_ask_command)
     printf("?");
+  /* i hate c io i hate c io i hate c io */
+  fflush(stdin);
+  fflush(stdout);
   if(variable_to_ask < 4)
   {
-    buffer = getchar();
+    tmp = getchar();
   }
   else
   {
     do
     {
       loop = scanf("%u",&tmp);
+      printf("%i\n",loop);
       if(!loop)
       {
         byte c;
@@ -202,6 +205,8 @@ static void Command_Ask(struct Runtime* const Env)
     }
     while(!loop);
   }
+  printf("%i\n",tmp);
+
   Set_Var(Env,variable_to_ask,(byte)tmp);
 }
 

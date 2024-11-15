@@ -19,6 +19,7 @@ struct Interpreter_Data Generate_Interpreter_Data(const int argv, char **argc)
   Initialize_Interpreter_Data_Struct(&out);
   do
   {
+    option = argc[index][1];
     if((strlen(argc[index]) != 2) && (index < (argv-1)))
     {
       Print_Error(invalid_argument_error, TRUE);
@@ -82,7 +83,7 @@ struct Interpreter_Data Generate_Interpreter_Data(const int argv, char **argc)
       }
     }
     index++;
-    option = argc[index][1];
+
   }
   while(index < (argv-1));
   /*last argument is filename*/
