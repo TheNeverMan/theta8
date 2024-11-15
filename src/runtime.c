@@ -596,9 +596,10 @@ void Interpret(struct Interpreter_Data Flags, struct Program_Data Program)
   while(loop && !(Env.is_out_of_file))
   {
     loop = Interpret_Command(&Env);
+    char c;
     if(Env.Flags.is_in_step_by_step_mode)
       getchar();
-    fflush(stdout);
+    while ((c = getchar()) != '\n' && c != EOF) { }
   }
   free(Program.Variables);
   free(Program.Program);
