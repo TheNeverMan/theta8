@@ -171,22 +171,25 @@ static void Command_Print(struct Runtime* const Env)
 
 static void Command_Ask(struct Runtime* const Env)
 {
-  byte variable_to_ask = Get_Next_Pixel(Env);
-  char format_mask[4] = "%i";
+  const byte variable_to_ask = Get_Next_Pixel(Env);
   byte buffer = ' ';
+  unsigned int tmp = 0;
   bool loop = FALSE;
   if(Env->Flags.is_in_debug_mode)
     printf("Ask %c\n",Get_Variable_Name(variable_to_ask));
+  printf("%i\n", variable_to_ask);
+
+  if(Env->Flags.show_prompt_on_ask_command)
+    printf("?");
   if(variable_to_ask < 4)
   {
     buffer = getchar();
   }
   else
+  {
     do
     {
-      if(Env->Flags.show_prompt_on_ask_command)
-        printf("?");
-      loop = scanf(format_mask,&buffer);
+      loop = scanf("%u",&tmp);
       if(!loop)
       {
         byte c;
@@ -198,7 +201,8 @@ static void Command_Ask(struct Runtime* const Env)
       }
     }
     while(!loop);
-  Set_Var(Env,variable_to_ask,buffer);
+  }
+  Set_Var(Env,variable_to_ask,(byte)tmp);
 }
 
 static void Command_Set(struct Runtime* const Env)

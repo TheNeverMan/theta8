@@ -23,7 +23,6 @@ struct Interpreter_Data Generate_Interpreter_Data(const int argv, char **argc)
     {
       Print_Error(invalid_argument_error, TRUE);
     }
-    printf("%c\n",option);
     switch(option)
     {
       case 'v':
