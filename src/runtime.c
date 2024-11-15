@@ -180,8 +180,8 @@ static void Command_Ask(struct Runtime* const Env)
   if(Env->Flags.show_prompt_on_ask_command)
     printf("?");
   /* i hate c io i hate c io i hate c io */
-  fflush(stdin);
-  fflush(stdout);
+  /*fflush(stdin);
+  fflush(stdout);*/
   if(variable_to_ask < 4)
   {
     tmp = getchar();
@@ -599,7 +599,6 @@ void Interpret(struct Interpreter_Data Flags, struct Program_Data Program)
     if(Env.Flags.is_in_step_by_step_mode)
       getchar();
     fflush(stdout);
-    fflush(stdin);
   }
   free(Program.Variables);
   free(Program.Program);
