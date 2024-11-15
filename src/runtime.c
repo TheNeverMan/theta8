@@ -152,6 +152,12 @@ static char Get_End_Mode_Name(const byte variable)
   return names[variable % 8];
 }
 
+static char Get_RID_Operation_Name(const byte variable)
+{
+  char names[8] = {'?','<','-','>','+','~','r','?'};
+  return names[variable % 8];
+}
+
 static void Command_Print(struct Runtime* const Env)
 {
   byte variable_to_print = Get_Next_Pixel(Env);
@@ -456,7 +462,59 @@ static bool Command_End(struct Runtime* const Env)
 
 static void Command_RID(struct Runtime* const Env)
 {
-
+  byte operation = Get_Next_Pixel(Env);
+  byte var_1 = Get_Next_Pixel(Env);
+  byte val_1 = Get_Var(Env,var_1);
+  Validate_Argument(Env, operation);
+  if(Env->Flags.is_in_debug_mode)
+    printf("RID %c %c\n",Get_Variable_Name(var_1),Get_RID_Operation_Name(operation));
+  switch(operation)
+  {
+    case RED:
+    {
+      Set_Var(Env,var_1,val_1++);
+      break;
+    }
+    case GREEN:
+    {
+      Set_Var(Env,var_1,val_1--);
+      break;
+    }
+    case BLUE:
+    {
+      Set_Var(Env,var_1,val_1 << 1);
+      break;
+    }
+    case CYAN:
+    {
+      Set_Var(Env,var_1,val_1 >> 1);
+      break;
+    }
+    case MAGENTA:
+    {
+      Set_Var(Env,var_1,~val_1);
+      break;
+    }
+    case YELLOW:
+    {
+      Set_Var(Env,var_1,rand()%256);
+      break;
+    }
+    case BLACK:
+    {
+      Trigger_Error(Env, unused_argument_error);
+      break;
+    }
+    case WHITE:
+    {
+      Trigger_Error(Env, unused_argument_error);
+      break;
+    }
+    default:
+    {
+      Trigger_Error(Env, unused_argument_error);
+    }
+  }
 }
 
 static bool Interpret_Command(struct Runtime* const Env)
