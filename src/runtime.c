@@ -176,7 +176,6 @@ static void Command_Ask(struct Runtime* const Env)
   bool loop = FALSE;
   if(Env->Flags.is_in_debug_mode)
     printf("Ask %c\n",Get_Variable_Name(variable_to_ask));
-  printf("%i\n", variable_to_ask);
 
   if(Env->Flags.show_prompt_on_ask_command)
     printf("?");
@@ -192,7 +191,6 @@ static void Command_Ask(struct Runtime* const Env)
     do
     {
       loop = scanf("%u",&tmp);
-      printf("%i\n",loop);
       if(!loop)
       {
         byte c;
@@ -205,8 +203,6 @@ static void Command_Ask(struct Runtime* const Env)
     }
     while(!loop);
   }
-  printf("%i\n",tmp);
-
   Set_Var(Env,variable_to_ask,(byte)tmp);
 }
 
