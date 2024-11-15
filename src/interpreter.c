@@ -23,7 +23,7 @@ struct Interpreter_Data Generate_Interpreter_Data(const int argv, char **argc)
     {
       Print_Error(invalid_argument_error, TRUE);
     }
-
+    printf("%c\n",option);
     switch(option)
     {
       case 'v':
@@ -83,6 +83,7 @@ struct Interpreter_Data Generate_Interpreter_Data(const int argv, char **argc)
       }
     }
     index++;
+    option = argc[index][1];
   }
   while(index < (argv-1));
   /*last argument is filename*/

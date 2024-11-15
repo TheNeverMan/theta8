@@ -23,6 +23,6 @@ void Show_Help_Message()
   puts("-p Treat warnings as errors");
   puts("-e Display full error and warning messages (Warnings are displayed only if -w is used).");
   puts("-w Display optional warning messages.");
-  puts("-q Stop displaying filename of the executed program at the beginning of interpretation.");
+  puts("-q Stop being verbose (no filename and program content on startup, less information about errors).");
   puts("-a Show prompt on ask command.");
 }
