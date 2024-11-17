@@ -1,8 +1,8 @@
 #include "version.h"
 
 static const int major = 2;
-static const int minor = 0;
-static const int revision = 1;
+static const int minor = 1;
+static const int revision = 0;
 
 int Calculate_Size_Of_String_From_Int(int value)
 {

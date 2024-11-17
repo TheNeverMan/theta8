@@ -28,10 +28,14 @@ static void Pretty_Display_Variable_Values(const struct Runtime* const Env)
   puts("Loaded variables:");
   while(var_index < 8)
   {
-    printf("%c: %i (0x%X) \n", names[var_index],Env->Program.Variables[var_index],Env->Program.Variables[var_index]);
+    printf("%c: %i (0x%X)", names[var_index],Env->Program.Variables[var_index],Env->Program.Variables[var_index]);
+    if(Env->Program.Variables[var_index] > 31)
+      printf(" '%c'",Env->Program.Variables[var_index]);
+    printf("\n");
     var_index++;
   }
   printf("PC: %i (0x%X)\n",Env->program_counter, Env->Program.Program[(Env->program_counter+1)%56]);
+  printf("SP: %i (0x%X) SD: %i\n",Env->Stack[Env->stack_pointer],Env->Stack[Env->stack_pointer],Env->stack_pointer);
 }
 
 static void Trigger_Warning(const struct Runtime* const Env, const int warning_code)
@@ -420,6 +424,7 @@ static bool Command_End(struct Runtime* const Env)
     case GREEN:
     {
       memcpy(Env->Program.Variables, Env->Default_Variables, sizeof(byte)* 8);
+      memcpy(Env->Program.Program, Env->Default_Code, sizeof(byte)* 56);
       Env->stack_pointer = 0;
       Env->program_counter = -1;
       break;
@@ -431,6 +436,7 @@ static bool Command_End(struct Runtime* const Env)
     }
     case CYAN:
     {
+      memcpy(Env->Program.Program, Env->Default_Code, sizeof(byte)* 56);
       Env->stack_pointer = 0;
       Env->program_counter = -1;
       break;
@@ -442,6 +448,7 @@ static bool Command_End(struct Runtime* const Env)
     }
     case YELLOW:
     {
+      memcpy(Env->Program.Program, Env->Default_Code, sizeof(byte)* 56);
       Set_Var(Env,BLACK,rand() % 256);
       Env->stack_pointer = 0;
       Env->program_counter = -1;
@@ -581,10 +588,11 @@ static bool Interpret_Command(struct Runtime* const Env)
 
 void Interpret(struct Interpreter_Data Flags, struct Program_Data Program)
 {
-  struct Runtime Env = {Flags,Program,{0},-1,0,0,{0}};
+  struct Runtime Env = {Flags,Program,{0},-1,0,0,{0},{0}};
   bool loop = TRUE;
   srand(time(NULL));
   memcpy(Env.Default_Variables, Env.Program.Variables, sizeof(byte)* 8);
+  memcpy(Env.Default_Code, Env.Program.Program, sizeof(byte)* 56);
   if(!Env.Flags.quiet)
   {
     int index = 0;

@@ -15,6 +15,7 @@ struct Runtime
   bool is_out_of_file;
   int stack_pointer;
   byte Stack[16];
+  byte Default_Code[56];
 };
 
 void Interpret(struct Interpreter_Data Flags, struct Program_Data Program);
