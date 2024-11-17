@@ -1,11 +1,12 @@
 MLang Documentation
+Version 2-TEARSOFORPHANCHILDREN
 
 MLang is "bad piet clone", thus all programs are in fact images
 
 FILE FORMAT
 -----------
 
-MLang program is 8x8 ppm bitmap.
+MLang program is 8x8 ppm bitmap. Any other bitmap format will not be accepted.
 
 MEANING OF BYTES IN PROGRAM
 ---------------------------
@@ -37,11 +38,11 @@ Magenta - #FF00FF
 Yellow - #FFFF00
 White - #FFFFFF
 Black - #000000
-This means that there are 8 commands, 8 accessible one byte unsigned variables.
-Execution of program starts from top-left corner if program reaches down-right corner without proper termination it should stop (i think interpreter loops it then).
-Due to problems with converting 24bit RGB to unsigned chars if you want to hardcode arbitrary byte values (like ASCII values) you should set Red Value of pixel in
-your image editor to proper value.
-When commands refer to their arguments, these arguments are next pixels of the program.
+This means that there are 8 commands and 8 accessible one byte long unsigned variables.
+Execution of program starts from top-left corner if program reaches down-right corner without proper termination when loading arguments for a command it will load White pixels (while producing warnings). If even then the program doesn't stop interpreter will keep loading White pixels. White command with White argument is End command which will terminate the program.
+Due to problems with converting 24bit RGB to unsigned chars if you want to hardcode arbitrary byte values (like ASCII values) you should set red channel value of pixel in your image editor to desired value.
+When commands refer to their arguments, these arguments are next pixels (those which are on the right side of the command pixel) of the program (note that variable pixels are excluded from program space).
+When something refers to "address" of command or program cell it means value from 0 to 55 which is real size of the program (no variables).
 Also there is 16 bytes big stack which can not be accessed directly, it is used for jumping.
 
 VARIABLES
@@ -50,16 +51,16 @@ There are 8 variables, each described by one color from list above.
 They are all unsigned chars, however half of them are "text" variables and second half are "numeric".
 
 Text:
-Black
-Blue
-Green
-Cyan
+Black   - Bl
+Blue    - B
+Green   - G
+Cyan    - C
 
 Numeric:
-Red
-Magenta
-Yellow
-White
+Red     - R
+Magenta - M
+Yellow  - Y
+White   - W
 
 The difference is that when Print command is used with text variables coresponding ASCII character is displayed, while when
 printing numeric variables just value is displayed. Same applied when used with Ask command.
@@ -79,13 +80,19 @@ Yellow - Jump
 White - End
 Black - RID
 
+In MLang there are two color orders used. Binary (Bl B G C R M Y W) mirrors the memory representation of variables.
+However for almost everything else RGB is used (R G B C M Y W Bl) is used. Usually Red operation is the most "basic" and "default". White and Black most commonly go unused.
+This can be confusing, but it is useful to remember these orders when coding in MLang.
+
 Print
 -----
 
 Arguments:
 Variable
 
-Displays choosen variable on screen.
+Displays chosen variable on screen.
+Text variables (Bl B G C) are displayed by their corresponding character in ASCII and
+numeric variables (R M Y W) are displayed as number from 0 to 255.
 
 
 Ask
@@ -94,7 +101,9 @@ Ask
 Arguments:
 Variable
 
-Takes input from the user and stores it in choosen variable.
+Takes input from the user and stores it in chosen variable.
+When text variable (Bl B G C) is inputted, user is asked for entering a single ASCII character. Its code is stored in variable.
+When numeric variable (R M Y W) is inputted, user is asked for entering a number from 0 to 255.
 
 Set
 ---
@@ -118,7 +127,7 @@ White       -               -
 
 Variable - Color of one of variables
 Value - Arbitrary value coded in Red byte of the pixel
-Address - Address of one of the bytes in program (0-55) coded in Red byte of the pixel
+Address - Address of one of the bytes in program (0-55), coded in Red byte of the pixel
 
 After determining Set Type, Value 1 is copied to Value 2 ex.
 Value of Red Variable copied to Blue Variable
@@ -143,7 +152,7 @@ Yellow - !=
 Black - unused
 White - unused
 
-Then variable next to choosen variable is taken (see VARIABLES chapter).
+Then variable next to chosen variable is taken (see VARIABLES chapter).
 Then the condition is checked on these variables.
 Example:
 Variable Choosen - a
@@ -163,7 +172,7 @@ Variable
 
 It is easiest to explain Math command using pseudocode:
 
-Choosen Variable -> a;
+Chosen Variable -> a;
 Variable Next to it -> b;
 
 Operation      What Math Command does
@@ -176,15 +185,13 @@ Yellow         b = ~(b & a);
 Black          b = b & a;
 White          b = b | a;
 
-(i'm using c++ syntax)
-
 Jump
 ----
 
 Arguments:
 Address
 
-If address is 0x0 returns to the current address on stack and then pops it. If stack is empty does nothing.
+If address is 0x0 returns to the top address on stack and then pops it. If stack is empty does nothing.
 If address is not zero jumps to it and puts current address on stack. If stack is full overwrites last cell.
 
 RID
@@ -214,14 +221,22 @@ END
 Arguments:
 End operation
 
-Depending on end operation End:
+In version 2, Blue and Magenta operations were deprecated and Black and White operations were added.
 
-End Operation      What End does
-Red                Ends program
-Green              Resets variables to initial values, cleans stack and restarts program execution (this also means that everything modified in program code by Set command also gets reverted)
-Blue               unused
-Cyan               cleans stack and restarts program execution (however keeps current variables state)(this also means that everything modified in program code by Set command also gets reverted)
-Magenta            unused
-Yellow             same as Cyan but value of Black variable is randomized (this also means that everything modified in program code by Set command also gets reverted)
-Black              performs jump to 0 and puts current program counter on stack (like jump command)
-White              Ends program
+End command resets program data in various ways:
+
+End Operation | Program Ends | Vars   Reset | Program Reset | Stack Reset | PC Reset | Black Randomized |
+Red           |     XXX      |              |               |             |          |                  |
+Green         |              |     XXX      |     XXX       |     XXX     |    XXX   |                  |
+Blue(unused)  |              |              |               |             |          |                  |
+Cyan          |              |              |     XXX       |     XXX     |    XXX   |                  |
+Magenta(unused)              |              |               |             |          |                  |
+Yellow        |              |              |     XXX       |     XXX     |    XXX   |       XXX        |
+Black         |              |              |               |             |    XXX   |                  |
+White         |    XXX       |              |               |             |          |                  |
+
+Vars Reset means that all variables are set back to their default values defined in program.
+Program Reset means that all modifications made to the program code by Set commands are reverted and program is loaded again from file.
+Stack Reset means that Stack Pointer is set back to zero and all values on Stack are zeroed.
+PC Reset means that Program Counter is set to zero.
+Black Randomized means that value of Black variable is set to random value.
