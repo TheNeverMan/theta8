@@ -14,12 +14,12 @@ MEANING OF BYTES IN PROGRAM
 MLang programs have following structure:
 
 x x x x x x x x
-x x x 0 x x x x
-x x x 0 x x x x
-x x x x x 0 0 x
-x 0 0 x x x x x
-x x x x 0 x x x
-x x x x 0 x x x
+x x x L x x x x
+x x x B x x x x
+x x x x x G C x
+x R M x x x x x
+x x x x Y x x x
+x x x x W x x x
 x x x x x x x x
 
 x - program bytes
