@@ -1,5 +1,5 @@
 MLang Documentation
-Version 2-TEARSOFORPHANCHILDREN
+Version 3-SECONDWORSTTHING
 
 MLang is "bad piet clone", thus all programs are in fact images
 
@@ -23,21 +23,21 @@ x x x x W x x x
 x x x x x x x x
 
 x - program bytes
-0 - variable values
+Letters are variable that are stored in corresponding pixel.
 
 PROGRAM
 -------
 
 As you could guess from before, each MLang program has 56 bytes (or less).
 Commands are colorcoded with basic colors:
-Red - #FF0000
-Green - #00FF00
-Blue - #0000FF
-Cyan - #00FFFF
+Red     - #FF0000
+Green   - #00FF00
+Blue    - #0000FF
+Cyan    - #00FFFF
 Magenta - #FF00FF
-Yellow - #FFFF00
-White - #FFFFFF
-Black - #000000
+Yellow  - #FFFF00
+White   - #FFFFFF
+Black   - #000000
 This means that there are 8 commands and 8 accessible one byte long unsigned variables.
 Execution of program starts from top-left corner if program reaches down-right corner without proper termination when loading arguments for a command it will load White pixels (while producing warnings). If even then the program doesn't stop interpreter will keep loading White pixels. White command with White argument is End command which will terminate the program.
 Due to problems with converting 24bit RGB to unsigned chars if you want to hardcode arbitrary byte values (like ASCII values) you should set red channel value of pixel in your image editor to desired value.
@@ -71,14 +71,14 @@ next variable to Black is Blue, to Red is Magenta and to White is Black
 COMMANDS
 --------
 There are 8 commands, each described by one color:
-Red - Print
-Green - Ask
-Blue - Set
-Cyan - If
+Red     - Print
+Green   - Ask
+Blue    - Set
+Cyan    - If
 Magenta - Math
-Yellow - Jump
-White - End
-Black - RID
+Yellow  - Jump
+White   - End
+Black   - RID
 
 In MLang there are two color orders used. Binary (Bl B G C R M Y W) mirrors the memory representation of variables.
 However for almost everything else RGB is used (R G B C M Y W Bl) is used. Usually Red operation is the most "basic" and "default". White and Black most commonly go unused.
@@ -143,14 +143,14 @@ Variable
 Command
 
 Firstly condition is determined:
-Red - ==
-Green - >
-Blue - <
-Cyan - >=
+Red     - ==
+Green   - >
+Blue    - <
+Cyan    - >=
 Magenta - <=
-Yellow - !=
-Black - unused
-White - unused
+Yellow  - !=
+Black   - unused
+White   - unused
 
 Then variable next to chosen variable is taken (see VARIABLES chapter).
 Then the condition is checked on these variables.
@@ -212,7 +212,7 @@ Blue               a = a << 1
 Cyan               a = a >> 1
 Magenta            a = ~a
 Yellow             a = rand()
-Black              unused
+Black              swaps values of a with next variable to a
 White              unused
 
 END
