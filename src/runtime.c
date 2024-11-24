@@ -372,7 +372,7 @@ static void Command_Math(struct Runtime* const Env)
     }
     case WHITE:
     {
-      Set_Var(Env,(var_1+1) % 8,~(val_2 | val_1));
+      Set_Var(Env,(var_1+1) % 8,(val_2 | val_1));
       break;
     }
     default:
