@@ -514,7 +514,9 @@ static void Command_RID(struct Runtime* const Env)
     }
     case BLACK:
     {
-      Trigger_Error(Env, unused_argument_error);
+      byte tmp = Get_Next_Var(Env,var_1);
+      Set_Var(Env,((var_1 + 1)%8),val_1);
+      Set_Var(Env, var_1, tmp);
       break;
     }
     case WHITE:
