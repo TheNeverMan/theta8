@@ -129,10 +129,10 @@ Variable - Color of one of variables
 Value - Arbitrary value coded in Red byte of the pixel
 Address - Address of one of the bytes in program (0-55), coded in Red byte of the pixel
 
-After determining Set Type, Value 1 is copied to Value 2 ex.
-Value of Red Variable copied to Blue Variable
-Value 0x45 to Black Variable
-Value of byte 0x05 to Blue Variable
+After determining Set Type, value 1 is copied to value 2 ex.
+Value of Red variable copied to Blue Variable
+Value 0x45 to Black variable
+Value of byte 0x05 to Blue variable
 
 If
 --
@@ -155,13 +155,15 @@ White   - unused
 Then variable next to chosen variable is taken (see VARIABLES chapter).
 Then the condition is checked on these variables.
 Example:
-Variable Choosen - a
+Variable chosen - a
 Variable next to it - b
 Condition - >=
 What if does:
 a >= b
 
-If condition is true Command is executed if not it is skipped.
+If condition is true command is executed if not it is skipped.
+Note that if there are two If commands one after another (if if command), and condition for first If is false, the second If will be skipped,
+but then command after it will be executed normally.
 
 Math
 ----
@@ -170,10 +172,11 @@ Arguments:
 Operation
 Variable
 
-It is easiest to explain Math command using pseudocode:
+Math performs mathematical operations on given variable and next variable, result is stored in next variable.
+Variable provided is on the right side of equation.
 
-Chosen Variable -> a;
-Variable Next to it -> b;
+Chosen variable -> a;
+Variable next to it -> b;
 
 Operation      What Math Command does
 Red            b = b + a;
@@ -203,7 +206,7 @@ Variable
 
 RID stands for Rotate Increment Decrement and I made it due to lack of easy way to increment or decrement something.
 
-Choosen Variable -> a
+Chosen variable -> a
 
 RID Operation      What RID does
 Red                a++
