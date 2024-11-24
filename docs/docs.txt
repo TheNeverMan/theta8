@@ -225,15 +225,16 @@ In version 2, Blue and Magenta operations were deprecated and Black and White op
 
 End command resets program data in various ways:
 
-End Operation | Program Ends | Vars   Reset | Program Reset | Stack Reset | PC Reset | Black Randomized |
-Red           |     XXX      |              |               |             |          |                  |
-Green         |              |     XXX      |     XXX       |     XXX     |    XXX   |                  |
-Blue(unused)  |              |              |               |             |          |                  |
-Cyan          |              |              |     XXX       |     XXX     |    XXX   |                  |
-Magenta(unused)              |              |               |             |          |                  |
-Yellow        |              |              |     XXX       |     XXX     |    XXX   |       XXX        |
-Black         |              |              |               |             |    XXX   |                  |
-White         |    XXX       |              |               |             |          |                  |
+| End Operation   | Program Ends | Vars   Reset | Program Reset | Stack Reset | PC Reset | Black Randomized |
+| --------------- | ------------ | ------------ | ------------- | ----------- | -------- | ---------------- |
+| Red             |    XXX       |              |               |             |          |                  |
+| Green           |              |     XXX      |     XXX       |     XXX     |    XXX   |                  |
+| Blue(unused)    |              |              |               |             |          |                  |
+| Cyan            |              |              |     XXX       |     XXX     |    XXX   |                  |
+| Magenta(unused) |              |              |               |             |          |                  |
+| Yellow          |              |              |     XXX       |     XXX     |    XXX   |       XXX        |
+| Black           |              |              |               |             |    XXX   |                  |
+| White           |    XXX       |              |               |             |          |                  |
 
 Vars Reset means that all variables are set back to their default values defined in program.
 Program Reset means that all modifications made to the program code by Set commands are reverted and program is loaded again from file.
