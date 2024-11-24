@@ -158,7 +158,7 @@ Example:
 Variable chosen - a
 Variable next to it - b
 Condition - >=
-What if does:
+What If does:
 a >= b
 
 If condition is true command is executed if not it is skipped.
