@@ -131,14 +131,13 @@ function Validate_End_Mode_And_Extract(MODE)
   return COMMANDS[MODE]
 }
 
-function Count_Words(STRING,   OUT)
+function Count_Words(STRING,   OUTZ)
 {
-  OUT = 0
-  while(sub(" ","-",STRING))
-    OUT++
-  OUT++
-  while(sub("-"," ",STRING));
-  return OUT
+  OUTZ = 1
+  split(STRING,TMP_ARR," ")
+  while(TMP_ARR[OUTZ] != "")
+    OUTZ++
+  return OUTZ-1
 }
 
 function Count_Bytes_To_Command(COMMAND_INDEX,   TMP,OUT)
@@ -147,7 +146,7 @@ function Count_Bytes_To_Command(COMMAND_INDEX,   TMP,OUT)
   OUT = 0
   while(TMP < COMMAND_INDEX)
   {
-    OUT = OUT + Count_Words(PROGRAM[COMMAND_INDEX])
+    OUT = OUT + Count_Words(PROGRAM[TMP])
     TMP++
   }
   return OUT
@@ -170,7 +169,10 @@ function Get_Constant(VAL)
   }
   if(VAL ~ /^[0-9]{1,3}$/)
   {
-    VARIABLES[VAR[2]] = VAL
+    return VAL
+  }
+  if(VAL ~ /^\*/)
+  {
     return VAL
   }
   ERROR = "IC"
@@ -218,46 +220,53 @@ function Print_Pixel(STRING)
   exit -1
 }
 
+function Get_Variable_Numeric(VAR)
+{
+  if(VARIABLES[VAR] ~ /^\*/)
+    return LABELS_ADDRESS[VARIABLES[VAR]]
+  return VARIABLES[VAR]
+}
+
 function Print_Var()
 {
   if(PIXEL_COUNTER == 11)
   {
-    Print_Pixel("b" VARIABLES["L"])
+    Print_Pixel("b" Get_Variable_Numeric("L"))
     PIXEL_COUNTER++
   }
   if(PIXEL_COUNTER == 19)
   {
-    Print_Pixel("b" VARIABLES["B"])
+    Print_Pixel("b" Get_Variable_Numeric("B"))
     PIXEL_COUNTER++
   }
   if(PIXEL_COUNTER == 29)
   {
-    Print_Pixel("b" VARIABLES["G"])
+    Print_Pixel("b" Get_Variable_Numeric("G"))
     PIXEL_COUNTER++
   }
   if(PIXEL_COUNTER == 30)
   {
-    Print_Pixel("b" VARIABLES["C"])
+    Print_Pixel("b" Get_Variable_Numeric("C"))
     PIXEL_COUNTER++
   }
   if(PIXEL_COUNTER == 33)
   {
-    Print_Pixel("b" VARIABLES["R"])
+    Print_Pixel("b" Get_Variable_Numeric("R"))
     PIXEL_COUNTER++
   }
   if(PIXEL_COUNTER == 34)
   {
-    Print_Pixel("b" VARIABLES["M"])
+    Print_Pixel("b" Get_Variable_Numeric("M"))
     PIXEL_COUNTER++
   }
   if(PIXEL_COUNTER == 44)
   {
-    Print_Pixel("b" VARIABLES["Y"])
+    Print_Pixel("b" Get_Variable_Numeric("Y"))
     PIXEL_COUNTER++
   }
   if(PIXEL_COUNTER == 52)
   {
-    Print_Pixel("b" VARIABLES["W"])
+    Print_Pixel("b" Get_Variable_Numeric("W"))
     PIXEL_COUNTER++
   }
 }
@@ -366,12 +375,17 @@ BEGIN {
   TMP = 1
   if(COMMAND[TMP] ~ /^\*/)
   {
-    split(COMMAND_TMP,LABEL_DEF,",")
-    LABELS[LABEL_DEF[1]] = COMMAND_INDEX
+    LABEL_NAME = COMMAND[TMP]
     LABEL_OFFSET = 0
-    if(LABEL_DEF[2] != "")
-      LABEL_OFFSET = LABEL_DEF[2]
-    LABELS_ADDRESS[LABEL_DEF[1]] = LABEL_OFFSET
+    if(LABEL_NAME ~ /,*/)
+    {
+      split(COMMAND[TMP],LABEL_DEF,",")
+      LABEL_NAME = LABEL_DEF[1]
+      if(LABEL_DEF[2] != "")
+        LABEL_OFFSET = LABEL_DEF[2]
+    }
+    LABELS[LABEL_NAME] = COMMAND_INDEX
+    LABELS_ADDRESS[LABEL_NAME] = LABEL_OFFSET
     TMP++
   }
   if(COMMAND[TMP] == "p")
@@ -448,10 +462,11 @@ BEGIN {
     COMMAND_INDEX++
     next
   }
-  if(COMMAND[TMP] ~ /^\./)
+  if(COMMAND[TMP] ~ /^\.$/)
   {
     CONSTANT = Get_Constant(COMMAND[++TMP])
     PROGRAM[COMMAND_INDEX] = Change_To_b_Value(CONSTANT)
+    COMMAND_INDEX++
     next
   }
   ERROR = "IO"
@@ -479,7 +494,7 @@ END {
   Resolve_Labels();
   for(INDEX in LABELS_ADDRESS)
   {
-    print INDEX " " LABELS_ADDRESS[INDEX] > "/dev/stderr"
+    print INDEX " " LABELS[INDEX] " " LABELS_ADDRESS[INDEX] > "/dev/stderr"
   }
   Output_PPM();
 }
