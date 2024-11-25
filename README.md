@@ -15,6 +15,9 @@ It uses all 8 variables and 100% of 56 bytes of program space (it only prints `F
 File `docs/docs.txt` contains full language specification and explanation of all commands. It isn't the best specification ever, but to my defense this thing is so simple that it is mostly selfexplanatory.
 
 In `sample-programs` directory there are few sample programs written by me that show (underwhelming) capabilities of this language. By interacting with them you get to experience the amazing bitmap obfuscation feature, that when you encode program to MLang format it is almost impossible to tell what it does at glance or debug it (without carefully writing down it pixel by pixel somewhere else).
+
+Files with `.mli` extension are written in MLang intermediate notation (see next paragraph).
+
 # Interpreter and Toolchain
 `src` directory contains code of C interpreter that accepts MLang programs as input. It is called `mlangc` because previously I made a terrible C++ one (the "barely functional product") and this is an attempt to create good and usable one. This interpreter has options to produce warning (unwanted or undefined behaviours that are handled in potentially unexpected way - like returning when stack is empty), treat them as errors, produce verbose debug output or run in step by step mode.
 

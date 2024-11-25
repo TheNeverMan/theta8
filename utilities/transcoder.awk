@@ -32,7 +32,8 @@
 # ax - ASCII character
 # variable initialization
 # :x [number|ascii]
-
+# arbitrary constant value in program
+# . constant
 # comments
 # ;sdasdadsads
 
@@ -156,7 +157,7 @@ function Resolve_Labels()
 {
   for(LABEL in LABELS)
   {
-    LABELS_ADDRESS[LABEL] = Count_Bytes_To_Command(LABELS[LABEL])
+    LABELS_ADDRESS[LABEL] += Count_Bytes_To_Command(LABELS[LABEL])
   }
 }
 
@@ -365,7 +366,12 @@ BEGIN {
   TMP = 1
   if(COMMAND[TMP] ~ /^\*/)
   {
-    LABELS[COMMAND[TMP]] = COMMAND_INDEX
+    split(COMMAND_TMP,LABEL_DEF,",")
+    LABELS[LABEL_DEF[1]] = COMMAND_INDEX
+    LABEL_OFFSET = 0
+    if(LABEL_DEF[2] != "")
+      LABEL_OFFSET = LABEL_DEF[2]
+    LABELS_ADDRESS[LABEL_DEF[1]] = LABEL_OFFSET
     TMP++
   }
   if(COMMAND[TMP] == "p")
@@ -440,6 +446,12 @@ BEGIN {
     Validate_Variable(RID_VAR)
     PROGRAM[COMMAND_INDEX] = COMMANDS["L"] " " COMMANDS[OPERATION] " " Change_To_b_Value(RID_VAR)
     COMMAND_INDEX++
+    next
+  }
+  if(COMMAND[TMP] ~ /^\./)
+  {
+    CONSTANT = Get_Constant(COMMAND[++TMP])
+    PROGRAM[COMMAND_INDEX] = Change_To_b_Value(CONSTANT)
     next
   }
   ERROR = "IO"
