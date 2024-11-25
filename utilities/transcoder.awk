@@ -182,7 +182,6 @@ function Get_Constant(VAL)
 
 function Print_Pixel(STRING)
 {
-  print STRING > "/dev/stderr"
   if(STRING ~ /^c/)
   {
     split(STRING,TMP_ARR,"")
