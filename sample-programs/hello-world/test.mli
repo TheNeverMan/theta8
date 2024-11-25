@@ -1,3 +1,4 @@
+; basic hello world
 :L aH
 :B al
 :G ae
