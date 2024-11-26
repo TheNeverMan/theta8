@@ -102,12 +102,12 @@ function Validate_Address_And_Extract(ADDRESS)
 {
   if(ADDRESS ~ /^\*/)
   {
-    if(LABELS[ADDRESS] == "")
-    {
-      ERROR = "IL"
-      ERROR_DATA = ADDRESS
-      exit -1
-    }
+#    if(LABELS[ADDRESS] == "")
+#    {
+#      ERROR = "IL"
+#      ERROR_DATA = ADDRESS
+#      exit -1
+#    }
     return ADDRESS
   }
   if(ADDRESS ~ /^[[:digit:]]*$/)
@@ -292,7 +292,7 @@ function Output_PPM()
   }
   #fill remaining empty space with w h i t e
   print "Size " SIZE "/56 bytes" > "/dev/stderr"
-  if(PIXEL_COUNTER >= 64)
+  if(PIXEL_COUNTER > 64)
     print "TW:FS - Program Is Too Big - " PIXEL_COUNTER
   while(PIXEL_COUNTER < 64)
   {
@@ -301,7 +301,6 @@ function Output_PPM()
     print "255 255 255"
     PIXEL_COUNTER++
   }
-
 }
 
 BEGIN {
@@ -340,6 +339,7 @@ BEGIN {
   COMMANDS["%"] = "c5"
   COMMANDS["~&"] = "c6"
   COMMANDS["|"] = "c7"
+  COMMANDS["<>"] = "c0"
   COMMANDS["<<"] = "c1"
   COMMANDS["--"] = "c2"
   COMMANDS[">>"] = "c3"
@@ -359,6 +359,7 @@ BEGIN {
   ERRORS["IO"] = "Invalid Command"
   ERRORS["IP"] = "Invalid Pixel"
   COMMAND_INDEX = 0
+  REWIND = 1
   for(n=0;n<256;n++) ASCII[sprintf("%c",n)]=n
 }
 
@@ -371,7 +372,6 @@ BEGIN {
 
 #read code
  /^[^:;]/ {
-
   #extract and save labels if any
   split($0, COMMAND," ");
   TMP = 1
@@ -388,6 +388,7 @@ BEGIN {
     }
     LABELS[LABEL_NAME] = COMMAND_INDEX
     LABELS_ADDRESS[LABEL_NAME] = LABEL_OFFSET
+    print "Found label " LABEL_NAME " at " COMMAND_INDEX " with offset " LABBEL_OFFSET > "/dev/stderr"
     TMP++
   }
   if(COMMAND[TMP] == "p")
@@ -494,9 +495,5 @@ END {
   }
   print "Labels:" > "/dev/stderr"
   Resolve_Labels();
-  for(INDEX in LABELS_ADDRESS)
-  {
-    print INDEX " " LABELS[INDEX] " " LABELS_ADDRESS[INDEX] > "/dev/stderr"
-  }
   Output_PPM();
 }
