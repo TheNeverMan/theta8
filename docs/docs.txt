@@ -6,7 +6,8 @@ MLang is "bad piet clone", thus all programs are in fact images
 FILE FORMAT
 -----------
 
-MLang program is 8x8 ppm bitmap. Any other bitmap format will not be accepted.
+MLang program is 8x8 PPM bitmap. It MUST be P6 type PPM (binary encoded, three color channels).
+Any other bitmap format will not be accepted.
 
 MEANING OF BYTES IN PROGRAM
 ---------------------------
