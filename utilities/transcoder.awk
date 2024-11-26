@@ -19,7 +19,7 @@
 # var2 technically can be anything but MUST be something
 # op: + - * / % ~& & |
 # Jump  - jump
-# jump [add|label]
+# jump [number|label]
 # RID   - rid
 # op var
 # op: ++ -- << >> ~ rand <>
@@ -102,12 +102,12 @@ function Validate_Address_And_Extract(ADDRESS)
 {
   if(ADDRESS ~ /^\*/)
   {
-    if(LABELS[ADDRESS] == "")
-    {
-      ERROR = "IL"
-      ERROR_DATA = ADDRESS
-      exit -1
-    }
+#    if(LABELS[ADDRESS] == "")
+#    {
+#      ERROR = "IL"
+#      ERROR_DATA = ADDRESS
+#      exit -1
+#    }
     return ADDRESS
   }
   if(ADDRESS ~ /^[[:digit:]]*$/)
@@ -277,6 +277,7 @@ function Output_PPM()
   print "8 8"
   print "255"
   PIXEL_COUNTER = 0
+  SIZE = 0
   for(COMMAND_INDEX in PROGRAM)
   {
     split(PROGRAM[COMMAND_INDEX],COMMAND," ")
@@ -285,11 +286,13 @@ function Output_PPM()
       Print_Var()
       Print_Var()
       Print_Pixel(COMMAND[BYTE])
+      SIZE++
       PIXEL_COUNTER++
     }
   }
   #fill remaining empty space with w h i t e
-  if(PIXEL_COUNTER >= 64)
+  print "Size " SIZE "/56 bytes" > "/dev/stderr"
+  if(PIXEL_COUNTER > 64)
     print "TW:FS - Program Is Too Big - " PIXEL_COUNTER
   while(PIXEL_COUNTER < 64)
   {
@@ -298,7 +301,6 @@ function Output_PPM()
     print "255 255 255"
     PIXEL_COUNTER++
   }
-
 }
 
 BEGIN {
@@ -337,6 +339,7 @@ BEGIN {
   COMMANDS["%"] = "c5"
   COMMANDS["~&"] = "c6"
   COMMANDS["|"] = "c7"
+  COMMANDS["<>"] = "c0"
   COMMANDS["<<"] = "c1"
   COMMANDS["--"] = "c2"
   COMMANDS[">>"] = "c3"
@@ -356,6 +359,7 @@ BEGIN {
   ERRORS["IO"] = "Invalid Command"
   ERRORS["IP"] = "Invalid Pixel"
   COMMAND_INDEX = 0
+  REWIND = 1
   for(n=0;n<256;n++) ASCII[sprintf("%c",n)]=n
 }
 
@@ -368,7 +372,6 @@ BEGIN {
 
 #read code
  /^[^:;]/ {
-
   #extract and save labels if any
   split($0, COMMAND," ");
   TMP = 1
@@ -385,6 +388,7 @@ BEGIN {
     }
     LABELS[LABEL_NAME] = COMMAND_INDEX
     LABELS_ADDRESS[LABEL_NAME] = LABEL_OFFSET
+    print "Found label " LABEL_NAME " at " COMMAND_INDEX " with offset " LABBEL_OFFSET > "/dev/stderr"
     TMP++
   }
   if(COMMAND[TMP] == "p")
@@ -491,9 +495,5 @@ END {
   }
   print "Labels:" > "/dev/stderr"
   Resolve_Labels();
-  for(INDEX in LABELS_ADDRESS)
-  {
-    print INDEX " " LABELS[INDEX] " " LABELS_ADDRESS[INDEX] > "/dev/stderr"
-  }
   Output_PPM();
 }
