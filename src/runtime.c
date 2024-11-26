@@ -158,7 +158,7 @@ static char Get_End_Mode_Name(const byte variable)
 
 static char Get_RID_Operation_Name(const byte variable)
 {
-  char names[8] = {'?','<','-','>','+','~','r','?'};
+  char names[8] = {'^','<','-','>','+','~','r','?'};
   return names[variable % 8];
 }
 
