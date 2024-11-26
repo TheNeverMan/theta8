@@ -19,7 +19,7 @@
 # var2 technically can be anything but MUST be something
 # op: + - * / % ~& & |
 # Jump  - jump
-# jump [add|label]
+# jump [number|label]
 # RID   - rid
 # op var
 # op: ++ -- << >> ~ rand <>
@@ -277,6 +277,7 @@ function Output_PPM()
   print "8 8"
   print "255"
   PIXEL_COUNTER = 0
+  SIZE = 0
   for(COMMAND_INDEX in PROGRAM)
   {
     split(PROGRAM[COMMAND_INDEX],COMMAND," ")
@@ -285,10 +286,12 @@ function Output_PPM()
       Print_Var()
       Print_Var()
       Print_Pixel(COMMAND[BYTE])
+      SIZE++
       PIXEL_COUNTER++
     }
   }
   #fill remaining empty space with w h i t e
+  print "Size " SIZE "/56 bytes" > "/dev/stderr"
   if(PIXEL_COUNTER >= 64)
     print "TW:FS - Program Is Too Big - " PIXEL_COUNTER
   while(PIXEL_COUNTER < 64)

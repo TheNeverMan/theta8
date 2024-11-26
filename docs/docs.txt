@@ -242,5 +242,5 @@ End command resets program data in various ways:
 Vars Reset means that all variables are set back to their default values defined in program.
 Program Reset means that all modifications made to the program code by Set commands are reverted and program is loaded again from file.
 Stack Reset means that Stack Pointer is set back to zero and all values on Stack are zeroed.
-PC Reset means that Program Counter is set to zero.
+PC Reset means that Program Counter is set to zero. However if operation is Black, current PC value is pushed to stack like in Jump command.
 Black Randomized means that value of Black variable is set to random value.

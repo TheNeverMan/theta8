@@ -162,6 +162,28 @@ static char Get_RID_Operation_Name(const byte variable)
   return names[variable % 8];
 }
 
+static void Push_Current_Address_To_Stack(struct Runtime* const Env)
+{
+  if(Env->stack_pointer == 15)
+    Trigger_Warning(Env,stack_full);
+  else
+    Env->stack_pointer++;
+  Env->Stack[Env->stack_pointer] = Env->program_counter;
+}
+
+static byte Pop_Address_From_Stack(struct Runtime* const Env)
+{
+  byte out = 0;
+  if(!(Env->stack_pointer))
+  {
+    Trigger_Warning(Env,stack_empty);
+    return Env->program_counter;
+  }
+  out = Env->Stack[Env->stack_pointer];
+  Env->stack_pointer--;
+  return out;
+}
+
 static void Command_Print(struct Runtime* const Env)
 {
   byte variable_to_print = Get_Next_Pixel(Env);
@@ -390,20 +412,10 @@ static void Command_Jump(struct Runtime* const Env)
     printf("Jump %i\n",address);
   if(!address)
   {
-    if(!(Env->stack_pointer))
-    {
-      Trigger_Warning(Env,stack_empty);
-      return;
-    }
-    Env->program_counter = Env->Stack[Env->stack_pointer];
-    Env->stack_pointer--;
+    Env->program_counter = Pop_Address_From_Stack(Env);
     return;
   }
-  if(Env->stack_pointer == 15)
-    Trigger_Warning(Env,stack_full);
-  else
-    Env->stack_pointer++;
-  Env->Stack[Env->stack_pointer] = Env->program_counter;
+  Push_Current_Address_To_Stack(Env);
   Env->program_counter = address - 1;
 }
 
@@ -456,6 +468,7 @@ static bool Command_End(struct Runtime* const Env)
     }
     case BLACK:
     {
+      Push_Current_Address_To_Stack(Env);
       Env->program_counter = -1;
       break;
     }
