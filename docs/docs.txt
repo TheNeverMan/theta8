@@ -1,5 +1,5 @@
 MLang Documentation
-Version 3-SECONDWORSTTHING
+Version 4-BLOODFORTHEBLOODGOD
 
 MLang is "bad piet clone", thus all programs are in fact images
 
@@ -52,7 +52,7 @@ There are 8 variables, each described by one color from list above.
 They are all unsigned chars, however half of them are "text" variables and second half are "numeric".
 
 Text:
-Black   - Bl
+Black   - Bl/L
 Blue    - B
 Green   - G
 Cyan    - C
@@ -123,17 +123,19 @@ Blue      Variable       Address
 Cyan      Value          Address
 Magenta   Address        Variable
 Yellow    Address        Address
-Black       -               -
-White       -               -
+Black     Addr(Var)      Variable
+White     Variable       Addr(Var)
 
 Variable - Color of one of variables
 Value - Arbitrary value coded in Red byte of the pixel
 Address - Address of one of the bytes in program (0-55), coded in Red byte of the pixel
+Addr(Var) - Address that given variable value equals to
 
 After determining Set Type, value 1 is copied to value 2 ex.
 Value of Red variable copied to Blue Variable
 Value 0x45 to Black variable
 Value of byte 0x05 to Blue variable
+Address which variable Magenta points to to Blue variable
 
 If
 --

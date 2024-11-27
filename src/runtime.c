@@ -272,6 +272,16 @@ static void Command_Set(struct Runtime* const Env)
       Set_Addr(Env,val_2,Get_Addr(Env,val_1));
       break;
     }
+    case WHITE:
+    {
+      Set_Var(Env,val_2,Get_Addr(Env,Get_Var(Env,val_1)));
+      break;
+    }
+    case BLACK:
+    {
+      Set_Addr(Env,Get_Var(Env,val_2),Get_Var(Env,val_1));
+      break;
+    }
     default:
     {
       Trigger_Error(Env, unused_argument_error);
