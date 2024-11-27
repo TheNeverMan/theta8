@@ -274,12 +274,12 @@ static void Command_Set(struct Runtime* const Env)
     }
     case WHITE:
     {
-      Set_Var(Env,val_2,Get_Addr(Env,Get_Var(Env,val_1)));
+      Set_Addr(Env,Get_Var(Env,val_2),Get_Var(Env,val_1));
       break;
     }
     case BLACK:
     {
-      Set_Addr(Env,Get_Var(Env,val_2),Get_Var(Env,val_1));
+      Set_Var(Env,val_2,Get_Addr(Env,Get_Var(Env,val_1)));
       break;
     }
     default:
