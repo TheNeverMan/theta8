@@ -1,5 +1,5 @@
 ; This program asks user for a name (by displaying a question) and the prints it
-; 
+; User input is terminated with Tab key
 :L 0
 ; tab key
 :B 9
