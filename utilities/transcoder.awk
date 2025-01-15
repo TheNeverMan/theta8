@@ -1,7 +1,7 @@
 #!/bin/awk -f
-#This program transcodes intermediate MLang programs to NetPBM bitmaps
+#This program transcodes intermediate theta8 programs to NetPBM bitmaps
 # Intermediate notation standard
-# label command arguments (in MLang order)
+# label command arguments (in theta8 order)
 # labels: *labelname
 # commands:
 # Print - p

@@ -3,7 +3,7 @@
 void Show_Version()
 {
   char* version = Get_Version_String();
-  printf("MLangC Interpreter Version %s\n",version);
+  printf("theta8C Interpreter Version %s\n",version);
   puts("By TheNeverMan in 2024");
   /* fuck doctrine, but i can't live without putting my faith everywhere sorry :<*/
   puts("do not defeat. do not fight back. do not surrender.");
@@ -14,7 +14,7 @@ void Show_Version()
 void Show_Help_Message()
 {
   Show_Version();
-  puts("Usage: mlang [OPTIONS] [FILE]");
+  puts("Usage: theta8 [OPTIONS] [FILE]");
   puts("Available options:");
   puts("-h Display this help information.");
   puts("-v Display version information.");

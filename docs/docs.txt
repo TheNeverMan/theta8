@@ -1,18 +1,18 @@
-MLang Documentation
+theta8 Documentation
 Version 4-BLOODFORTHEBLOODGOD
 
-MLang is "bad piet clone", thus all programs are in fact images
+theta8 is "bad piet clone", thus all programs are in fact images
 
 FILE FORMAT
 -----------
 
-MLang program is 8x8 PPM bitmap. It MUST be P6 type PPM (binary encoded, three color channels).
+theta8 program is 8x8 PPM bitmap. It MUST be P6 type PPM (binary encoded, three color channels).
 Any other bitmap format will not be accepted.
 
 MEANING OF BYTES IN PROGRAM
 ---------------------------
 
-MLang programs have following structure:
+theta8 programs have following structure:
 
 x x x x x x x x
 x x x L x x x x
@@ -29,7 +29,7 @@ Letters are variable that are stored in corresponding pixel.
 PROGRAM
 -------
 
-As you could guess from before, each MLang program has 56 bytes (or less).
+As you could guess from before, each theta8 program has 56 bytes (or less).
 Commands are colorcoded with basic colors:
 Red     - #FF0000
 Green   - #00FF00
@@ -81,9 +81,9 @@ Yellow  - Jump
 White   - End
 Black   - RID
 
-In MLang there are two color orders used. Binary (Bl B G C R M Y W) mirrors the memory representation of variables.
+In theta8 there are two color orders used. Binary (Bl B G C R M Y W) mirrors the memory representation of variables.
 However for almost everything else RGB is used (R G B C M Y W Bl) is used. Usually Red operation is the most "basic" and "default". White and Black most commonly go unused.
-This can be confusing, but it is useful to remember these orders when coding in MLang.
+This can be confusing, but it is useful to remember these orders when coding in theta8.
 
 Print
 -----

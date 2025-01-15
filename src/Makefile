@@ -1,4 +1,4 @@
 all: main.c
-	gcc -ansi -pedantic -ggdb -Wall *.c -o mlangc -lm
+	gcc -ansi -pedantic -ggdb -Wall *.c -o theta8c -lm
 clean:
-	$(RM) mlangc
+	$(RM) theta8c
